@@ -52,7 +52,9 @@ class File extends Driver implements GarbageCollect
      * Check that the cache directory exists and writeable. Attempts to create
      * it if not exists.
      *
-     * @throws  Exception
+     * @throws Exception
+     *
+     * @return void
      */
     protected function _checkCacheDir()
     {

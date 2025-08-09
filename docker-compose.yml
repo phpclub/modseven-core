@@ -1,0 +1,14 @@
+services:
+  modseven:
+    env_file:
+      - .env
+    image: kohanaworld/docker:travis-devel-8.4
+    container_name: ${COMPOSE_PROJECT_NAME}-php
+    hostname: ${COMPOSE_PROJECT_NAME}-php
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/
+      - ./public:/var/www/public
+    networks:
+      - default
+    command: php -S localhost:8000

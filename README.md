@@ -84,6 +84,40 @@ No. Also original modules won't be compatible.
 
 Any help is more than welcome! Just fork this repo and do a PR.
 
+
+## Docker
+```
+cp .env.dist .env
+docker compose up -d
+docker compose exec modseven bash
+```
+
+#### Inside container
+```shell
+service redis-server start
+cd /var/www
+git config --global --add safe.directory /var/www
+composer self-update
+composer diagnose
+apt update
+apt install php8.4-intl
+composer install
+```
+
+## Unittests
+```shell
+# For clear cache
+service redis-server restart
+vendor/bin/phpunit
+# Switch PHP version
+update-alternatives --config php
+```
+
+## Psalm
+```shell
+vendor/bin/psalm --alter --issues=MissingIterableValueType --dry-run tests/
+```
+
 ## Special Thanks
 
 Special Thanks to all Contributors and the Community!

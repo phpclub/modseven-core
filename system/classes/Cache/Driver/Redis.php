@@ -107,6 +107,8 @@ class Redis extends Driver implements Tagging
 
     /**
      * @inheritDoc
+     *
+     * @return false|string
      */
     public function get(string $key)
     {
@@ -124,7 +126,7 @@ class Redis extends Driver implements Tagging
     /**
      * @inheritDoc
      */
-    public function set(string $key, $data, $lifetime = 3600) : bool
+    public function set(string $key, $data, int|null $lifetime = 3600) : bool
     {
         // Fit try to set the element
         if (!$this->_redis->set($key, $data))

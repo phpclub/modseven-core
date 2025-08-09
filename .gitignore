@@ -11,3 +11,6 @@ composer.lock
 
 # Coverage reports etc..
 /build/*
+/.env
+/.phpunit.result.cache
+/.phpunit.cache/test-results
