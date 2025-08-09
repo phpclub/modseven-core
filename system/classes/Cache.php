@@ -247,7 +247,7 @@ class Cache implements CacheItemPoolInterface, CacheInterface
      *
      * @param string[] $keys An indexed array of keys of items to retrieve.
      *
-     * @return array|\Traversable
+     * @return Item[] | \Traversable
      *   A traversable collection of Cache Items keyed by the cache keys of
      *   each item. A Cache item will be returned for each key, even if that
      *   key is not found. However, if no keys are specified then an empty
@@ -404,7 +404,7 @@ class Cache implements CacheItemPoolInterface, CacheInterface
             $item->setSanitizedKey($this->_sanitizeId($item->getKey()));
         }
 
-        return $this->_driver->set($item->getSanitizedKey(), $item->get(), $item->getLifetime());
+        return $this->_driver->set($item->getSanitizedKey(), $item->get(), $item->getLifeTime());
     }
 
     /**
