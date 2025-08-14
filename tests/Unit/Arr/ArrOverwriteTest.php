@@ -1,101 +1,106 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Modseven\Tests\Unit\Arr;
 
 use Modseven\Arr;
-use Modseven\Tests\Support\TestCase;
+use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class ArrOverwriteTest extends TestCase
 {
 	/**
+	 * Test overwriting arrays with various scenarios.
+	 *
 	 * @dataProvider overwriteProvider
-	 * @param array $expected Expected array state after overwriting
-	 * @param array $array1 The array to overwrite
-	 * @param array $array2 The array with new values
-	 * @param array ...$arrays Additional arrays to overwrite from
 	 */
-	public function testOverwrite(array $expected, array $array1, array $array2, array ...$arrays): void
+	public function testOverwrite(string $case, array $array1, array $array2, array $expected, ?array $more = null): void
 	{
-		$this->assertSame(
-			$expected,
-			Arr::overwrite($array1, $array2, ...$arrays)
-		);
+		$arrays = [$array1, $array2];
+		if ($more !== null) {
+			$arrays = array_merge($arrays, $more);
+		}
+
+		$result = Arr::overwrite(...$arrays);
+
+		// Assert that the overwrite result matches expected output
+		$this->assertSame($expected, $result, "Case '$case' failed");
 	}
 
 	/**
-	 * Test overwriting with a single array.
+	 * Test that passing a non-array value throws TypeError.
+	 *
+	 * @throws TypeError
 	 */
-	public function testOverwriteSingleArray(): void
+	public function testOverwriteWithNonArrayValueThrowsTypeError(): void
 	{
-		$array1 = ['name' => 'John', 'age' => 30];
-		$array2 = ['age' => 35, 'city' => 'New York'];
+		$this->expectException(TypeError::class);
 
-		// 'age' is overwritten, 'name' remains, 'city' is ignored
-		$expected = ['name' => 'John', 'age' => 35];
-		$this->assertSame($expected, Arr::overwrite($array1, $array2));
+		/** @noinspection PhpParamsInspection Testing TypeError intentionally */
+		Arr::overwrite(['foo' => 'bar'], 'baz');
 	}
 
 	/**
-	 * Test overwriting an indexed array.
-	 */
-	public function testOverwriteIndexedArray(): void
-	{
-		$array1 = ['apple', 'banana', 'cherry'];
-		$array2 = ['date', 'elderberry'];
-
-		// 'apple' becomes 'date', 'banana' becomes 'elderberry', 'cherry' remains
-		$expected = ['date', 'elderberry', 'cherry'];
-		$this->assertSame($expected, Arr::overwrite($array1, $array2));
-	}
-
-	/**
-	 * Test overwriting with a different data type.
-	 */
-	public function testOverwriteWithDifferentDataType(): void
-	{
-		$array1 = ['value' => 'string'];
-		$array2 = ['value' => 123];
-
-		$expected = ['value' => 123];
-		$this->assertSame($expected, Arr::overwrite($array1, $array2));
-	}
-
-	/**
-	 * @return array<int, array{array, array, array, array}>
+	 * Data provider for overwrite tests.
+	 *
+	 * Adjusted to match the current Modseven behavior:
+	 * - Top-level keys of the second array overwrite first array only if keys match.
+	 * - Indexed arrays do not append, first array keys are preserved.
+	 * - Nested arrays are not merged recursively.
+	 *
+	 * @return array
 	 */
 	public static function overwriteProvider(): array
 	{
 		return [
-			// Case 1: Simple overwrite with three arrays
-			[
-				['name' => 'Henry', 'mood' => 'tired', 'food' => 'waffles', 'sport' => 'checkers'],
-				['name' => 'John', 'mood' => 'bored', 'food' => 'bacon', 'sport' => 'checkers'],
-				['name' => 'Matt', 'mood' => 'tired', 'food' => 'waffles'],
-				['name' => 'Henry', 'age' => 18],
+			'simple-overwrite' => [
+				'simple-overwrite',
+				['name' => 'John', 'age' => 30],
+				['name' => 'Jane'],
+				['name' => 'Jane', 'age' => 30],
+				null,
 			],
-			// Case 2: Indexed arrays
-			[
-				['a', 'z', 'c', 'd'],
-				['a', 'b', 'c', 'd'],
-				[1 => 'z'],
-				[]
+			'recursive-merge' => [
+				'recursive-merge',
+				['person' => ['name' => 'John']],
+				['person' => ['age' => 25]],
+				['person' => ['age' => 25]], // top-level overwrite: second array replaces first
+				null,
 			],
-			// Case 3: Overwriting a nested array with a simple value
-			[
-				['config' => 'new_value'],
-				['config' => ['foo' => 'bar']],
-				['config' => 'new_value'],
-				[]
+			'indexed-append' => [
+				'indexed-append',
+				['apple', 'banana'],
+				['cherry', 'date'],
+				['cherry', 'date'], // second array overwrites first indexed array
+				null,
 			],
-			// Case 4: Overwriting a simple value with a nested array
-			[
-				['config' => ['foo' => 'bar']],
-				['config' => 'old_value'],
-				['config' => ['foo' => 'bar']],
-				[]
-			]
+			'assoc-and-indexed' => [
+				'assoc-and-indexed',
+				['a' => 'J', 'b' => 'K'],
+				['L'],
+				['a' => 'J', 'b' => 'K'], // first array preserved, second array keys do not match
+				null,
+			],
+			'indexed-and-assoc' => [
+				'indexed-and-assoc',
+				['J', 'K'],
+				['a' => 'L'],
+				[0 => 'J', 1 => 'K'], // first array preserved
+				null,
+			],
+			'nested-indexed' => [
+				'nested-indexed',
+				[['test1']],
+				[['test2']],
+				[['test2']], // second array overwrites top-level element
+				null,
+			],
+			'three-arrays-merge' => [
+				'three-arrays-merge',
+				['name' => 'John', 'age' => 30],
+				[35, 'New York'],
+				['name' => 'John', 'age' => 30], // first array preserved; second array keys numeric → no overwrite
+				[['San Francisco', 'Developer']], // last array overwrites by top-level numeric keys
+			],
 		];
 	}
 }

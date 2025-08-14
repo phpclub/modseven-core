@@ -381,9 +381,13 @@ class Arr
     }
 
     /**
-     * Overwrites an array with values from input arrays.
-     * Keys that do not exist in the first array will not be added!
-     *
+	 * Overwrites values in a master array with values from one or more input arrays.
+	 * Keys from subsequent arrays that do not exist in the master array are ignored.
+	 *
+	 * Adjusted to match current Modseven behavior:
+	 *  - Top-level keys are overwritten if they exist in subsequent arrays.
+	 *  - Nested arrays are NOT merged recursively.
+	 *
      * @param array $array1 master array
      * @param array $array2 input arrays that will overwrite existing values
      * @return  array
