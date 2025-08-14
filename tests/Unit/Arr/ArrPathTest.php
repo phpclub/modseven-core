@@ -104,4 +104,15 @@ class ArrPathTest extends TestCase
 		$this->assertSame('not-found', $result);
 	}
 
+	public function testPathBreaksWhenIntermediateKeyIsScalar(): void
+	{
+		// 'a' exists, but is scalar; trying to go deeper to 'a.b' must hit the "break" branch and return default.
+		$array = ['a' => 'scalar'];
+
+		$this->assertSame(
+			'fallback',
+			\Modseven\Arr::path($array, 'a.b', 'fallback')
+		);
+	}
+
 }
