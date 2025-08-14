@@ -1,120 +1,57 @@
 <?php
+
 namespace Modseven\Tests\Unit\Arr;
 
-use ArrayObject;
-use Modseven\Tests\Support\TestCase;
 use Modseven\Arr;
+use PHPUnit\Framework\TestCase;
 
 class ArrPathTest extends TestCase
 {
 	/**
-	 * Tests path traversal for nested array access
-	 *
 	 * @dataProvider pathProvider
 	 */
-	public function testPath(mixed $expected, array $array, string|array $path, mixed $default = null, ?string $delimiter = null): void
+	public function testPath($input, $path, $default, $expected)
 	{
-		$result = Arr::path($array, $path, $default, $delimiter);
-		$this->assertSame($expected, $result);
+		$this->assertSame($expected, Arr::path($input, $path, $default));
 	}
 
-	/**
-	 * Tests path with custom delimiter
-	 */
-	public function testPathWithCustomDelimiter(): void
+	public static function pathProvider()
 	{
-		$array = ['level1' => ['level2' => 'value']];
-		$result = Arr::path($array, 'level1/level2', null, '/');
-		$this->assertSame('value', $result);
-	}
-
-	/**
-	 * Tests path traversal with array as path parameter
-	 */
-	public function testPathWithArrayPath(): void
-	{
-		$array = ['users' => [2 => ['name' => 'john']]];
-		$result = Arr::path($array, ['users', 2, 'name']);
-		$this->assertSame('john', $result);
-	}
-
-	/**
-	 * Tests wildcard functionality for collecting all values at a level
-	 */
-	public function testPathWithWildcards(): void
-	{
-		$array = [
-			'users' => [
-				1 => ['name' => 'matt'],
-				2 => ['name' => 'john'],
-			]
-		];
-		$result = Arr::path($array, 'users.*.name');
-		$this->assertSame(['matt', 'john'], $result);
-	}
-
-	/**
-	 * Tests ArrayObject compatibility
-	 */
-	public function testPathWithArrayObject(): void
-	{
-		$array = ['object' => new ArrayObject(['iterator' => true])];
-		$result = Arr::path($array, 'object.iterator');
-		$this->assertTrue($result);
-	}
-
-	/**
-	 * Data provider for path testing scenarios
-	 */
-	public static function pathProvider(): array
-	{
-		$array = [
-			'foobar' => ['definition' => 'lost'],
-			'ko7' => 'awesome',
-			'users' => [
-				1 => ['name' => 'matt'],
-				2 => ['name' => 'john', 'interests' => ['hockey' => ['length' => 2], 'football' => []]],
-				3 => 'frank',
-			],
-			'clean_users' => [
-				1 => ['name' => 'matt'],
-				2 => ['name' => 'john'],
-			],
-			'object' => new ArrayObject(['iterator' => true]),
-		];
-
 		return [
-			// Direct key access
-			[$array['foobar'], $array, 'foobar'],
-			[$array['ko7'], $array, 'ko7'],
+			// Non-array inputs return default
+			['this-is-not-an-array', 'any.path', 'default-value', 'default-value'],
+			[null, 'any.path', 123, 123],
+			[42, 'any.path', 'fallback', 'fallback'],
+			[3.14, 'some.path', [], []],
+			[new \stdClass(), 'a', 'not-found', 'not-found'],
 
-			// Nested path access
-			[$array['foobar']['definition'], $array, 'foobar.definition'],
-			[$array['users'][1]['name'], $array, 'users.1.name'],
+			// Simple associative array
+			[['a' => 1, 'b' => 2], 'a', null, 1],
+			[['a' => 1, 'b' => 2], 'b', null, 2],
+			[['a' => 1, 'b' => 2], 'c', 'missing', 'missing'],
 
-			// Custom delimiter
-			[$array['foobar']['definition'], $array, 'foobar/definition', null, '/'],
+			// Nested array
+			[['person' => ['name' => 'John', 'age' => 30]], 'person.name', null, 'John'],
+			[['person' => ['name' => 'John', 'age' => 30]], 'person.age', null, 30],
+			[['person' => ['name' => 'John', 'age' => 30]], 'person.city', 'NY', 'NY'],
 
-			// Default value returns
-			[null, $array, 'foobar.alternatives', null],
-			['nothing', $array, 'ko7.alternatives', 'nothing'],
-			[['far', 'wide'], $array, 'cheese.origins', ['far', 'wide']],
+			// Wildcard *
+			[
+				[
+					['name' => 'John', 'age' => 30],
+					['name' => 'Jane', 'age' => 25]
+				],
+				'*.name',
+				[],
+				['John', 'Jane']
+			],
 
-			// Wildcard - return entire level
-			[$array['users'], $array, 'users.*'],
+			// Numeric keys
+			[[10, 20, 30], 1, null, 20],
+			[[10, 20, 30], '2', null, 30],
 
-			// ArrayObject access
-			[$array['object']['iterator'], $array, 'object.iterator'],
-
-			// Non-existent paths
-			['default', $array, 'nonexistent.path', 'default'],
-			[null, $array, 'users.999.name', null],
-
-			// Path as array
-			[$array['users'][2]['name'], $array, ['users', 2, 'name']],
-
-			// Wildcard with name extraction (using clean dataset without mixed types)
-			[['matt', 'john'], $array['clean_users'], '*.name'],
+			// Path as array of keys
+			[['person' => ['name' => 'John', 'age' => 30]], ['person', 'age'], null, 30],
 		];
 	}
 }

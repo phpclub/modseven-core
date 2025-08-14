@@ -119,98 +119,93 @@ class Arr
         $array[array_shift($keys)] = $value;
     }
 
-    /**
-     * Gets a value from an array using a dot separated path.
-     *
-     * @param array $array array to search
-     * @param mixed $path key path string (delimiter separated) or array of keys
-     * @param mixed $default default value if the path is not set
-     * @param string $delimiter key path delimiter
-     *
-     * @return  mixed
-     */
-    public static function path(array $array, $path, $default = NULL, ?string $delimiter = NULL)
-    {
-        if (!self::isArray($array)) {
-            // This is not an array!
-            return $default;
-        }
+	/**
+	 * Retrieves a value from a multi-dimensional array using a "path" of keys.
+	 *
+	 * The path can be a string using a delimiter (default '.') or an array of keys.
+	 * Supports wildcard '*' to fetch multiple values.
+	 *
+	 * **Important:** Originally written in 2019, this method did not enforce strict type checking.
+	 * In PHP 8.0+ with strict typing, passing non-array types would throw a TypeError.
+	 * To preserve the ability to provide non-array values (e.g., null, string, int) and return
+	 * a default, the `$array` parameter is not type-hinted as `array`.
+	 *
+	 * @param mixed $array The array to search. Non-array values will cause the method to return `$default`.
+	 * @param string|array $path The path to the value, either as a delimiter-separated string or an array of keys.
+	 * @param mixed $default The default value to return if the path is not found or input is not an array.
+	 * @param string|null $delimiter The delimiter for string paths. Defaults to `static::$delimiter`.
+	 *
+	 * @return mixed The value found at the path, or `$default` if not found.
+	 *
+	 * @link https://www.php.net/manual/en/language.types.declarations.php Strict type declarations in PHP
+	 * @link https://wiki.php.net/rfc/strict_types History of strict typing and type enforcement
+	 * @link https://www.php.net/manual/en/language.types.declarations.strict.php Behavior in PHP 8+
+	 *
+	 * @since 2019 Original implementation in Modseven
+	 * @since PHP 8.0 Updated to remove array type hint to maintain backward compatibility with legacy tests
+	 */
+	public static function path($array, $path, $default = null, ?string $delimiter = null)
+	{
+		if (!self::isArray($array)) {
+			return $default;
+		}
 
-        if (is_array($path)) {
-            // The path has already been separated into keys
-            $keys = $path;
-        } else {
-            if (array_key_exists($path, $array)) {
-                // No need to do extra processing
-                return $array[$path];
-            }
+		if (is_array($path)) {
+			$keys = $path;
+		} else {
+			if (array_key_exists($path, $array)) {
+				return $array[$path];
+			}
 
-            if ($delimiter === NULL) {
-                // Use the default delimiter
-                $delimiter = static::$delimiter;
-            }
+			if ($delimiter === null) {
+				$delimiter = static::$delimiter;
+			}
 
-            // Remove starting delimiters and spaces
-            $path = ltrim($path, "{$delimiter} ");
+			$path = ltrim($path, "{$delimiter} ");
+			$path = rtrim($path, "{$delimiter} *");
+			$keys = explode($delimiter, $path);
+		}
 
-            // Remove ending delimiters, spaces, and wildcards
-            $path = rtrim($path, "{$delimiter} *");
+		do {
+			$key = array_shift($keys);
 
-            // Split the keys by delimiter
-            $keys = explode($delimiter, $path);
-        }
-
-        do {
-            $key = array_shift($keys);
 			/**
 			 * Cast to string to avoid deprecation in PHP 8.1+ when passing int to ctype_digit().
 			 * @link https://www.php.net/ctype_digit
 			 * @link https://wiki.php.net/rfc/deprecations_php_8_1
-			 *
-			*/
-            if (ctype_digit((string) $key)) {
-                // Make the key an integer
-                $key = (int)$key;
-            }
+			 */
+			if (ctype_digit((string) $key)) {
+				$key = (int)$key;
+			}
 
-            if (isset($array[$key])) {
-                if ($keys) {
-                    if (self::isArray($array[$key])) {
-                        // Dig down into the next part of the path
-                        $array = $array[$key];
-                    } else {
-                        // Unable to dig deeper
-                        break;
-                    }
-                } else {
-                    // Found the path requested
-                    return $array[$key];
-                }
-            } elseif ($key === '*') {
-                // Handle wildcards
+			if (isset($array[$key])) {
+				if ($keys) {
+					if (self::isArray($array[$key])) {
+						$array = $array[$key];
+					} else {
+						break;
+					}
+				} else {
+					return $array[$key];
+				}
+			} elseif ($key === '*') {
+				$values = [];
+				foreach ($array as $arr) {
+					if ($value = self::path($arr, implode($delimiter, $keys))) {
+						$values[] = $value;
+					}
+				}
+				if ($values) {
+					return $values;
+				}
+				break;
+			} else {
+				break;
+			}
+		} while ($keys);
 
-                $values = [];
-                foreach ($array as $arr) {
-                    if ($value = self::path($arr, implode('.', $keys))) {
-                        $values[] = $value;
-                    }
-                }
-
-                if ($values) {
-                    // Found the values requested
-                    return $values;
-                }
-
-                break;
-            } else {
-                // Unable to dig deeper
-                break;
-            }
-        } while ($keys);
-
-        // Unable to find the value requested
-        return $default;
-    }
+		return $default;
+	}
 
     /**
      * Test if a value is an array with an additional check for array-like objects.
@@ -305,66 +300,59 @@ class Arr
         return $array;
     }
 
-    /**
-     * Recursively merge two or more arrays. Values in an associative array
-     * overwrite previous values with the same key. Values in an indexed array
-     * are appended, but only when they do not already exist in the result.
-     *
-     * Note that this does not work the same as [array_merge_recursive](http://php.net/array_merge_recursive)!
-     *
-     * @param array $array1 initial array
-     * @param array $array2,... array to merge
-     *
-     * @return  array
-     */
-    public static function merge(array $array1, array $array2): array
-    {
-        if (self::isAssoc($array2)) {
-            foreach ($array2 as $key => $value) {
-                if (is_array($value)
-                    && isset($array1[$key])
-                    && is_array($array1[$key])
-                ) {
-                    $array1[$key] = self::merge($array1[$key], $value);
-                } else {
-                    $array1[$key] = $value;
-                }
-            }
-        } else {
-            foreach ($array2 as $value) {
-                if (!in_array($value, $array1, TRUE)) {
-                    $array1[] = $value;
-                }
-            }
-        }
+	/**
+	 * Recursively merge one or more arrays.
+	 *
+	 * This method merges arrays with the following rules:
+	 * - Associative keys are overwritten by later arrays.
+	 * - Numeric keys are appended without duplication.
+	 * - Nested arrays are merged recursively.
+	 * - Multiple arrays can be merged sequentially using variadic arguments.
+	 *
+	 * This behavior ensures compatibility with legacy Modseven array handling
+	 * while adapting to stricter type enforcement introduced in PHP 8.x.
+	 *
+	 * Usage note:
+	 * This method replaces the original merge logic written in November 2019,
+	 * which may behave differently under PHP 8.x when handling numeric keys
+	 * or deeply nested arrays.
+	 *
+	 * @param array $array1 The base array to merge into.
+	 * @param array $array2 The array to merge from.
+	 * @param array ...$arrays Optional additional arrays to merge sequentially.
+	 *
+	 * @return array The resulting merged array.
+	 *
+	 * @link https://www.php.net/manual/en/function.array-merge.php Official PHP array_merge() reference
+	 * @link https://www.php.net/manual/en/function.in-array.php Official PHP in_array() reference
+	 * @link https://www.php.net/manual/en/language.types.array.php Array type handling in PHP
+	 *
+	 * @since Modseven 2019 Original method
+	 * @since PHP 8.0 Adapted for strict typing and recursive merge
+	 */
+	public static function merge(array ...$arrays): array
+	{
+		$result = array_shift($arrays);
 
-        if (func_num_args() > 2) {
-            foreach (array_slice(func_get_args(), 2) as $array3) {
-                if (self::isAssoc($array3)) {
-                    foreach ($array3 as $key => $value) {
-                        if (is_array($value)
-                            && isset($array1[$key])
-                            && is_array($array1[$key])
-                        ) {
-                            $array1[$key] = self::merge($array1[$key], $value);
-                        } else {
-                            $array1[$key] = $value;
-                        }
-                    }
-                } else {
-                    foreach ($array3 as $value) {
-                        if (!in_array($value, $array1, TRUE)) {
-                            $array1[] = $value;
-                        }
-                    }
-                }
-            }
-        }
+		foreach ($arrays as $array) {
+			foreach ($array as $key => $value) {
+				if (is_int($key)) {
+					if (!in_array($value, $result, true)) {
+						$result[] = $value;
+					}
+				} elseif (isset($result[$key]) && is_array($result[$key]) && is_array($value)) {
+					$result[$key] = self::merge($result[$key], $value);
+				} else {
+					$result[$key] = $value;
+				}
+			}
+		}
 
-        return $array1;
-    }
+		return $result;
+	}
 
-    /**
+
+	/**
      * Tests if an array is associative or not.
      *
      * @param array $array array to check
