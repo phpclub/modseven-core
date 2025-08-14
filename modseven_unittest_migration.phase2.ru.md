@@ -105,41 +105,8 @@ https://raw.githubusercontent.com/modseven/core/e19454d261dbb69d3ec6a226b70cc9e0
 - **Скорость**: быстрое выполнение
 
 ### Documentation
-- Комментарии к сложным тестам
+- Комментарии ко всем теста, особенно сложным на PHP DOC на английском для понимания
 - Примеры использования в тестах
-- README с инструкциями по запуску
-
-## Инструменты и утилиты
-
-### Анализ покрытия
-```bash
-# Генерация отчета о покрытии
-vendor/bin/phpunit --coverage-html coverage/html
-
-# Проверка минимального покрытия
-vendor/bin/phpunit --coverage-text --coverage-clover coverage/clover.xml
-```
-
-### Статический анализ
-```bash
-# PHPStan
-vendor/bin/phpstan analyse tests/ --level=8
-
-# Psalm
-vendor/bin/psalm tests/ --show-info=true
-```
-
-### Автоматизация
-```bash
-# Запуск всех тестов
-vendor/bin/phpunit
-
-# Запуск конкретного теста
-vendor/bin/phpunit tests/Unit/Arr/CallbackTest.php
-
-# Запуск с фильтром
-vendor/bin/phpunit --filter testCallbackExecution
-```
 
 ## Результат
 
@@ -154,5 +121,5 @@ vendor/bin/phpunit --filter testCallbackExecution
 
 ## Важно перед началом работы 
 Добавляй PHP DOC на английском для понимания того что делает метод ::
-Cразу выдавай готовый тест валидируя корректность выполнения в PHP 8.4 ::
+Cразу выдавай готовый тест валидируя корректность выполнения в PHP 8.4, deprecated - я приравниваю к ошибкам, которые надо сразу исправлять ::
 Меньше подробностей, будь краток в чате. Не начинай отвечать пока я не скажу "++"
