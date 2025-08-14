@@ -42,7 +42,7 @@ final class ArrMapTest extends TestCase
 
 	/**
 	 * @test
-	 * @dataProvider providerMap/**
+	 * @dataProvider providerMap
 	 * @param callable|array $method
 	 * @param array $array
 	 * @param array|null $keys
@@ -53,7 +53,6 @@ final class ArrMapTest extends TestCase
 	{
 		$this->assertSame(
 			$expected,
-//			Arr::map($array, $method, $keys)
 			Arr::map($method, $array, $keys)
 		);
 	}
