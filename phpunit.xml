@@ -8,7 +8,15 @@
          stopOnFailure="false"
          cacheDirectory=".phpunit.cache"
 >
-
+    <coverage>
+        <include>
+            <file>./system/classes/Arr.php</file>
+        </include>
+        <report>
+            <text outputFile="php://stdout"/>
+            <html outputDirectory="./coverage-html"/>
+        </report>
+    </coverage>
     <testsuites>
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
@@ -22,5 +30,8 @@
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <ini name="display_errors" value="1"/>
+        <ini name="display_startup_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/> <!-- E_ALL включая E_DEPRECATED -->
     </php>
 </phpunit>

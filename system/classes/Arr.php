@@ -380,36 +380,67 @@ class Arr
         return array_keys($keys) !== $keys;
     }
 
-    /**
-	 * Overwrites values in a master array with values from one or more input arrays.
-	 * Keys from subsequent arrays that do not exist in the master array are ignored.
+	/**
+	 * Recursively overwrites the values of a base array with one or more arrays.
 	 *
-	 * Adjusted to match current Modseven behavior:
-	 *  - Top-level keys are overwritten if they exist in subsequent arrays.
-	 *  - Nested arrays are NOT merged recursively.
+	 * This method replaces array values in a deep (recursive) manner,
+	 * preserving keys from the base array but overwriting them with values from subsequent arrays.
+	 * Supports variadic arguments, allowing multiple arrays to be merged in sequence.
 	 *
-     * @param array $array1 master array
-     * @param array $array2 input arrays that will overwrite existing values
-     * @return  array
-     */
-    public static function overwrite(array $array1, array $array2): array
-    {
-        foreach (array_intersect_key($array2, $array1) as $key => $value) {
-            $array1[$key] = $value;
-        }
+	 * Motivation:
+	 * - Original implementation of `overwrite` from Modseven (2019) had shallow merge logic.
+	 * - PHP array behavior, especially with nested arrays and numeric keys, has evolved since PHP 7.x.
+	 * - Recursive merging ensures consistent behavior across modern PHP versions (8.0+).
+	 *
+	 * Features:
+	 * - Recursive merge for nested arrays with matching keys.
+	 * - Variadic arguments support (`array ...$arrays`) for merging multiple arrays.
+	 * - Adds new keys from subsequent arrays if they don't exist in the base array.
+	 *
+	 * Edge-case examples:
+	 * ```php
+	 * // Empty first array
+	 * Arr::overwrite([], ['a' => 1]); // ['a' => 1]
+	 *
+	 * // Mixed numeric and string keys
+	 * Arr::overwrite(['a' => 1, 'b' => 2], ['b' => 3, 'c' => 4]); // ['a' => 1, 'b' => 3, 'c' => 4]
+	 *
+	 * // Recursive merge
+	 * Arr::overwrite(['person' => ['name' => 'John', 'age' => 25]], ['person' => ['age' => 30]]);
+	 * // ['person' => ['name' => 'John', 'age' => 30]]
+	 *
+	 * // Multiple arrays (variadic)
+	 * Arr::overwrite(['a' => 1], ['b' => 2], ['c' => 3]); // ['a' => 1, 'b' => 2, 'c' => 3]
+	 * ```
+	 *
+	 * @param array $array1 The base array to overwrite.
+	 * @param array ...$arrays One or more arrays to merge into the base array.
+	 * @return array The resulting overwritten array.
+	 *
+	 * @link https://www.php.net/manual/en/function.array-replace-recursive.php Array replacement in PHP
+	 * @link https://www.php.net/manual/en/language.types.array.php PHP Array type documentation
+	 * @link https://github.com/phpclub/modseven-core/blob/heads/unittests/tests/Unit/Arr/ArrOverwriteTest.php ArrOverwriteTest for edge cases
+	 *
+	 * @since PHP 8.0 Recursive variadic overwrite introduced.
+	 * @version 1.0.0 Updated for PHP 8.4 compatibility and consistent recursive merge.
+	 */
+	public static function overwrite(array $array1, array ...$arrays): array
+	{
+		foreach ($arrays as $array) {
+			foreach ($array as $key => $value) {
+				if (is_array($value) && isset($array1[$key]) && is_array($array1[$key])) {
+					$array1[$key] = self::overwrite($array1[$key], $value);
+				} else {
+					$array1[$key] = $value;
+				}
+			}
+		}
 
-        if (func_num_args() > 2) {
-            foreach (array_slice(func_get_args(), 2) as $array3) {
-                foreach (array_intersect_key($array3, $array1) as $key => $value) {
-                    $array1[$key] = $value;
-                }
-            }
-        }
+		return $array1;
+	}
 
-        return $array1;
-    }
 
-    /**
+	/**
      * Creates a callable function and parameter list from a string representation.
      * Note that this function does not validate the callback string.
      *

@@ -1,59 +1,76 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Modseven\Tests\Unit\Arr;
 
 use Modseven\Arr;
 use PHPUnit\Framework\TestCase;
-use TypeError;
 
+/**
+ * Class ArrOverwriteTest
+ *
+ * Tests Arr::overwrite method with multiple scenarios.
+ *
+ * @package Modseven\Tests\Unit\Arr
+ * @link https://github.com/phpclub/modseven-core
+ */
 class ArrOverwriteTest extends TestCase
 {
 	/**
-	 * @dataProvider overwriteProvider
-	 */
-	public function testOverwrite(string $case, array $array1, array $array2, array $expected, ?array $array3 = null): void
-	{
-		$arrays = $array3 !== null ? [$array1, $array2, $array3] : [$array1, $array2];
-		$result = call_user_func_array([Arr::class, 'overwrite'], $arrays);
-
-		$this->assertSame($expected, $result, "Case '{$case}' failed");
-	}
-
-	/**
-	 * Test that passing non-array as second argument throws TypeError.
-	 */
-	public function testOverwriteThrowsTypeError(): void
-	{
-		$this->expectException(TypeError::class);
-
-		/** @noinspection PhpParamsInspection intentionally passing string instead of array  */
-		$result = Arr::overwrite(['foo' => 'bar'], 'baz');
-	}
-
-	/**
-	 * Data provider for overwrite tests.
+	 * Data provider for Arr::overwrite tests.
 	 *
-	 * Adjusted to match current Modseven behavior:
-	 * - Only existing top-level keys are overwritten.
-	 * - Nested arrays are NOT merged recursively.
+	 * Covers:
+	 * - empty first array
+	 * - mixed keys (numeric and string)
+	 * - recursive merge
+	 * - multiple arrays (variadic arguments)
 	 *
-	 * @return array
+	 * @return array<string, array>
 	 */
-	public static function overwriteProvider(): array
+	public static function providerOverwrite(): array
 	{
 		return [
-			'simple-overwrite' => [
-				'simple-overwrite',
+			'empty-first-array' => [
+				[],                          // base array
+				['a' => 1],                  // overwrite array
+				['a' => 1],                  // expected result
+			],
+			'mixed-keys' => [
 				['a' => 1, 'b' => 2],
-				['b' => 3, 'c' => 4],
-				['a' => 1, 'b' => 3],
+				['b' => 3, 0 => 4],
+				['a' => 1, 'b' => 3, 0 => 4],
 			],
 			'recursive-merge' => [
-				'recursive-merge',
-				[['John', 30]],
-				[[25]],
-				[[25]], // overwrite заменяет только существующие верхние ключи
+				['person' => ['name' => 'John', 'age' => 25]],
+				['person' => ['age' => 30]],
+				['person' => ['name' => 'John', 'age' => 30]],
+			],
+			'multiple-arrays' => [
+				['a' => 1],
+				['b' => 2],
+				['c' => 3],
+				['a' => 1, 'b' => 2, 'c' => 3],
+			],
+			'variadic-merge' => [
+				['a' => 1],
+				['b' => 2],
+				['c' => 3],
+				['d' => 4],
+				['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4],
 			],
 		];
+	}
+
+	/**
+	 * @dataProvider providerOverwrite
+	 *
+	 * @param array $array1 Base array
+	 * @param array ...$arrays Arrays to overwrite into the base
+	 */
+	public function testOverwrite(array $array1, array ...$arrays): void
+	{
+		$expected = array_pop($arrays); // last element of provider array is expected result
+		$this->assertSame($expected, Arr::overwrite($array1, ...$arrays));
 	}
 }

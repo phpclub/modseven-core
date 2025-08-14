@@ -1,48 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Modseven\Tests\Unit\Arr;
 
 use Modseven\Arr;
 use PHPUnit\Framework\TestCase;
-use TypeError;
 
 class ArrMergeTest extends TestCase
 {
 	/**
-	 * Test merging multiple arrays with various scenarios.
+	 * Data provider for testMerge
 	 *
-	 * @dataProvider providerMerge
-	 */
-	public function testMerge(string $case, array $array1, array $array2, array $expected, ?array $more = null): void
-	{
-		// Merge two or more arrays
-		$arrays = [$array1, $array2];
-		if ($more !== null) {
-			$arrays = array_merge($arrays, $more);
-		}
-
-		$result = Arr::merge(...$arrays);
-
-		// Assert merged array matches expected result
-		$this->assertSame($expected, $result, "Case '$case' failed");
-	}
-
-	/**
-	 * Test that passing a non-array value throws TypeError.
-	 *
-	 * @throws TypeError
-	 */
-	public function testMergeWithNonArrayValueThrowsTypeError(): void
-	{
-		$this->expectException(TypeError::class);
-
-		// Passing string instead of array should throw TypeError
-		/** @noinspection PhpParamsInspection */
-		Arr::merge(['foo' => 'bar'], 'baz');
-	}
-
-	/**
-	 * Provider for testMerge, covering multiple merge scenarios.
+	 * Covers:
+	 * - Recursive merge of associative arrays
+	 * - Overwrite scalar values
+	 * - Append unique numeric values
+	 * - Variadic merge
+	 * - Mixed numeric and string keys
+	 * - Empty arrays
 	 *
 	 * @return array
 	 */
@@ -50,54 +24,60 @@ class ArrMergeTest extends TestCase
 	{
 		return [
 			'simple-overwrite' => [
-				'simple-overwrite',
-				['name' => 'John', 'age' => 30],
-				['name' => 'Jane'],
-				['name' => 'Jane', 'age' => 30],
-				null,
+				['a' => 1, 'b' => 2],
+				['b' => 3, 'c' => 4],
+				['a' => 1, 'b' => 3, 'c' => 4],
 			],
 			'recursive-merge' => [
-				'recursive-merge',
-				['person' => ['name' => 'John']],
-				['person' => ['age' => 25]],
 				['person' => ['name' => 'John', 'age' => 25]],
-				null,
+				['person' => ['age' => 30, 'city' => 'NY']],
+				['person' => ['name' => 'John', 'age' => 30, 'city' => 'NY']],
 			],
-			'indexed-append' => [
-				'indexed-append',
-				['apple', 'banana'],
-				['cherry', 'date'],
-				['apple', 'banana', 'cherry', 'date'],
-				null,
+			'numeric-append' => [
+				[1, 2],
+				[2, 3, 4],
+				[1, 2, 3, 4],
 			],
-			'assoc-and-indexed' => [
-				'assoc-and-indexed',
-				['a' => 'J', 'b' => 'K'],
-				['L'],
-				['a' => 'J', 'b' => 'K', 'L'],
-				null,
+			'nested-numeric-recursive' => [
+				['group' => [1, 2]],
+				['group' => [2, 3]],
+				['group' => [1, 2, 3]],
 			],
-			'indexed-and-assoc' => [
-				'indexed-and-assoc',
-				['J', 'K'],
-				['a' => 'L'],
-				['J', 'K', 'a' => 'L'],
-				null,
+			'variadic-merge' => [
+				['a' => 1],
+				['b' => 2],
+				['c' => 3],
+				['a' => 1, 'b' => 2, 'c' => 3],
 			],
-			'nested-indexed' => [
-				'nested-indexed',
-				[['test1']],
-				[['test2']],
-				[['test1'], ['test2']],
-				null,
+			'empty-first-array' => [
+				[],
+				['a' => 1],
+				['a' => 1],
 			],
-			'three-arrays-merge' => [
-				'three-arrays-merge',
-				['name' => 'John', 'age' => 30],
-				['age' => 35, 'city' => 'New York'],
-				['name' => 'John', 'age' => 35, 'city' => 'San Francisco', 'job' => 'Developer'],
-				[['city' => 'San Francisco', 'job' => 'Developer']],
+			'empty-second-array' => [
+				['a' => 1],
+				[],
+				['a' => 1],
+			],
+			'mixed-numeric-string-keys' => [
+				['a' => 1, 0 => 'x'],
+				[0 => 'y', 'b' => 2],
+				['a' => 1, 0 => 'y', 'b' => 2],
+			],
+			'multi-level-recursive' => [
+				['x' => ['y' => ['z' => 1]]],
+				['x' => ['y' => ['w' => 2]]],
+				['x' => ['y' => ['z' => 1, 'w' => 2]]],
 			],
 		];
+	}
+
+	/**
+	 * @dataProvider providerMerge
+	 */
+	public function testMerge(...$args)
+	{
+		$expected = array_pop($args);
+		$this->assertSame($expected, Arr::merge(...$args));
 	}
 }

@@ -14,3 +14,5 @@ composer.lock
 /.env
 /.phpunit.result.cache
 /.phpunit.cache/test-results
+/coverage-html/
+/.phpunit.cache/
