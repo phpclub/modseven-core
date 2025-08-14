@@ -12,7 +12,7 @@ class ArrPathTest extends TestCase
 	 *
 	 * @dataProvider pathProvider
 	 */
-	public function testPath($expected, array $array, $path, $default = null, ?string $delimiter = null): void
+	public function testPath(mixed $expected, array $array, string|array $path, mixed $default = null, ?string $delimiter = null): void
 	{
 		$result = Arr::path($array, $path, $default, $delimiter);
 		$this->assertSame($expected, $result);

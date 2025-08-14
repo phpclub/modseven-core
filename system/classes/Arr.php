@@ -162,8 +162,24 @@ class Arr
 
         do {
             $key = array_shift($keys);
-
-            if (ctype_digit($key)) {
+			/**
+			 * PHP 8.1+ compatibility note:
+			 *
+			 * In PHP versions prior to 8.1, passing an integer to ctype_digit() was silently cast to string.
+			 * Starting from PHP 8.1 this behaviour is deprecated, and in PHP 8.4 it will trigger a deprecation
+			 * warning which may be converted to an exception when using `convertDeprecationsToExceptions`.
+			 *
+			 * Example of deprecated behaviour (PHP 8.1+):
+			 *     ctype_digit(123); // Deprecated: Argument of type int will be interpreted as string in the future
+			 *
+			 * To maintain compatibility across PHP 7.x, PHP 8.0, PHP 8.1, PHP 8.2, PHP 8.3, and future PHP 8.4,
+			 * we explicitly cast the argument to string before passing it to ctype_digit().
+			 *
+			 * Reference:
+			 * @link https://www.php.net/manual/en/function.ctype-digit.php
+			 * @link https://wiki.php.net/rfc/deprecations_php_8_1
+			 */
+            if (ctype_digit((string) $key)) {
                 // Make the key an integer
                 $key = (int)$key;
             }
