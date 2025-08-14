@@ -54,4 +54,54 @@ class ArrPathTest extends TestCase
 			[['person' => ['name' => 'John', 'age' => 30]], ['person', 'age'], null, 30],
 		];
 	}
+
+	/**
+	 * @dataProvider nonExistentPathProvider
+	 */
+	public function testPathBreaks($array, $path, $default, $expected)
+	{
+		$this->assertSame($expected, \Modseven\Arr::path($array, $path, $default));
+	}
+
+	public static function nonExistentPathProvider(): array
+	{
+		return [
+			'missing-key' => [
+				['a' => 1, 'b' => 2],
+				'c.d',
+				'not-found',
+				'not-found',
+			],
+			'wildcard-no-match' => [
+				[
+					['name' => 'John'],
+					['name' => 'Jane']
+				],
+				'*.age',
+				'not-found',
+				'not-found',
+			],
+		];
+	}
+
+
+	/**
+	 * Test coverage for Arr::path() wildcard with no matches (break at line 186)
+	 *
+	 * @link https://www.php.net/ctype_digit
+	 * @link https://wiki.php.net/rfc/deprecations_php_8_1
+	 */
+	public function testPathWildcardNoMatch()
+	{
+		$array = [
+			['name' => 'John'],
+			['name' => 'Jane']
+		];
+
+		// '*.age' does not exist, triggers the break at line 186
+		$result = \Modseven\Arr::path($array, '*.age', 'not-found');
+
+		$this->assertSame('not-found', $result);
+	}
+
 }
