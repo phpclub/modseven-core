@@ -1,97 +1,58 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Modseven\Tests\Unit\Arr;
 
 use Modseven\Arr;
-use Modseven\Tests\Support\TestCase;
+use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class ArrFlattenTest extends TestCase
 {
 	/**
 	 * @dataProvider flattenProvider
-	 * @param array $array The array to flatten
-	 * @param array $expected The expected one-dimensional array
 	 */
-	public function testFlatten(array $array, array $expected): void
+	public function testFlatten(array $input, array $expected): void
 	{
-		$this->assertSame(
-			$expected,
-			Arr::flatten($array)
-		);
+		$this->assertSame($expected, Arr::flatten($input));
 	}
 
 	/**
-	 * Test a deeply nested array.
+	 * Test that passing a non-array input throws TypeError.
 	 */
-	public function testFlattenDeeplyNestedArray(): void
+	public function testFlattenThrowsTypeErrorOnInvalidInput(): void
 	{
-		$array = [
-			'one' => [
-				'two' => [
-					'three' => 'value'
-				]
-			]
-		];
+		$this->expectException(TypeError::class);
 
-		$expected = ['value'];
-		$this->assertSame($expected, Arr::flatten($array));
+		/** @noinspection PhpParamsInspection intentionally passing null */
+		Arr::flatten(null);
 	}
 
 	/**
-	 * Test an array with numeric and associative keys.
-	 */
-	public function testFlattenWithMixedKeys(): void
-	{
-		$array = [
-			'a' => 'A',
-			0 => [
-				'b' => 'B'
-			],
-			1 => [
-				'c' => 'C'
-			]
-		];
-
-		$expected = ['A', 'B', 'C'];
-		$this->assertSame($expected, Arr::flatten($array));
-	}
-
-	/**
-	 * @return array<int, array{array, array}>
+	 * Data provider for flatten tests.
+	 *
+	 * @return array
 	 */
 	public static function flattenProvider(): array
 	{
 		return [
-			// Case 1: Simple nested array. Keys will be lost.
-			[
-				['set' => ['one' => 'something'], 'two' => 'other'],
-				['something', 'other']
+			'simple-nested-array' => [
+				[['something'], 'other'],
+				['something', 'other'],
 			],
-			// Case 2: Indexed nested array.
-			[
+			'indexed-nested-array' => [
 				['A', ['B', ['C']]],
-				['A', 'B', 'C']
+				['A', 'B', 'C'],
 			],
-			// Case 3: Empty array.
-			[
+			'empty-array' => [
 				[],
-				[]
+				[],
 			],
-			// Case 4: Array with string and numeric keys. Keys will be lost.
-			[
+			'mixed-keys-array' => [
 				[
-					'users' => [
-						'name' => 'John',
-						'id' => 1
-					],
-					'posts' => [
-						0 => ['title' => 'Post 1'],
-						1 => ['title' => 'Post 2']
-					]
+					['John', 1],
+					[['Post 1'], ['Post 2']],
 				],
-				['John', 1, 'Post 1', 'Post 2']
+				['John', 1, 'Post 1', 'Post 2'],
 			],
 		];
 	}

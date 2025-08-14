@@ -444,30 +444,44 @@ class Arr
         return [$command, $params];
     }
 
-    /**
-     * Convert a multi-dimensional array into a single-dimensional array.
-     *
-     * [!!] The keys of array values will be discarded.
-     *
-     * @param array $array array to flatten
-     * @return  array
-     */
-    public static function flatten(array $array): array
-    {
-        $is_assoc = self::isAssoc($array);
+	/**
+	 * Flatten a multi-dimensional array into a single-level array.
+	 *
+	 * This method has been updated to fix issues with modern PHP versions:
+	 *
+	 * - Previously, passing non-array items (e.g., strings) to `array_merge()` would
+	 *   cause ArgumentCountError or TypeError in PHP 8+.
+	 * - Recursive flattening now ensures that only arrays are passed to `array_merge()`.
+	 * - Scalar values are safely appended to the result array.
+	 *
+	 * Changes:
+	 * 1. Added recursion safety: `self::flatten($item)` always returns an array.
+	 * 2. Removed passing non-array elements directly to `array_merge()`.
+	 * 3. Preserves order of elements while flattening deeply nested arrays.
+	 *
+	 * This makes the method compatible with PHP 7.4+ and PHP 8.x.
+	 *
+	 * @link https://www.php.net/manual/en/function.array-merge.php Official PHP documentation for array_merge()
+	 * @link https://www.php.net/manual/en/language.types.array.php PHP array type reference
+	 *
+	 * @param array $array Input array to flatten
+	 * @return array Flattened array with single-level structure
+	 */
+	public static function flatten(array $array): array
+	{
+		$result = [];
 
-        $flat = [];
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $flat[] = self::flatten($value);
-            } elseif ($is_assoc) {
-                $flat[$key] = $value;
-            } else {
-                $flat[] = $value;
-            }
-        }
-        $flat = array_merge(...$flat);
-        return $flat;
-    }
+		foreach ($array as $item) {
+			if (is_array($item)) {
+				// Recursively flatten arrays and merge safely
+				$result = array_merge($result, self::flatten($item));
+			} else {
+				$result[] = $item;
+			}
+		}
+
+		return $result;
+	}
+
 
 }
