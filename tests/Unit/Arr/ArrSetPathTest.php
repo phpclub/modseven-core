@@ -10,13 +10,18 @@ class ArrSetPathTest extends TestCase
 {
 	/**
 	 * @dataProvider providerSetPath
+	 * @param array        $initial   Initial array passed by reference.
+	 * @param string|array $path      Path as string or array.
+	 * @param mixed        $value     Value to set.
+	 * @param array        $expected  Expected array after set.
+	 * @param string|null  $delimiter Optional delimiter for path splitting.
 	 */
 	public function testSetPath(
 		array &$initial,
-		string|array $path,
-		mixed $value,
+			  $path,
+			  $value,
 		array $expected,
-		?string $delimiter = null
+			  $delimiter = null
 	): void {
 		if ($delimiter !== null) {
 			Arr::$delimiter = $delimiter;

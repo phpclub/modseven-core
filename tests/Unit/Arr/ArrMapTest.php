@@ -42,13 +42,14 @@ final class ArrMapTest extends TestCase
 
 	/**
 	 * @test
-	 * @dataProvider providerMap
+	 * @dataProvider providerMap/**
 	 * @param callable|array $method
 	 * @param array $array
 	 * @param array|null $keys
 	 * @param array $expected
 	 */
-	public function testMap(callable|array $method, array $array, ?array $keys, array $expected): void
+	public function testMap($method, array $array, $keys, array $expected): void
+
 	{
 		$this->assertSame(
 			$expected,

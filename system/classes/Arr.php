@@ -21,7 +21,7 @@ class Arr
      * default delimiter for path()
      * @var string
      */
-    public static string $delimiter = '.';
+    public static $delimiter = '.';
 
     /**
      * Fill an array with a range of numbers.
@@ -482,12 +482,22 @@ class Arr
 	 *
 	 * @link https://www.php.net/manual/en/function.array-merge.php Official PHP documentation for array_merge()
 	 * @link https://www.php.net/manual/en/language.types.array.php PHP array type reference
+	 * Flattens a multi-dimensional array into a single level.
 	 *
-	 * @param array $array Input array to flatten
-	 * @return array Flattened array with single-level structure
+	 * @param array|string $array        Array or traversable structure to flatten.
+	 * @param bool         $preserve_keys Whether to preserve array keys.
+	 *
+	 * @return array
 	 */
-	public static function flatten(array $array): array
+	public static function flatten($array, $preserve_keys = false): array
 	{
+		if (!is_array($array)) {
+			throw new \TypeError(sprintf(
+				'%s() expects parameter 1 to be array, %s given',
+				__METHOD__,
+				gettype($array)
+			));
+		}
 		$result = [];
 
 		foreach ($array as $item) {

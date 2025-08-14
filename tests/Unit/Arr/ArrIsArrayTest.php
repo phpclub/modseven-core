@@ -40,8 +40,8 @@ class ArrIsArrayTest extends TestCase
         
         // Test with custom Traversable implementation
         $customTraversable = new class implements \Iterator {
-            private array $data = ['a', 'b', 'c'];
-            private int $position = 0;
+            private $data = ['a', 'b', 'c'];
+            private $position = 0;
             
             public function rewind(): void { $this->position = 0; }
             public function current(): mixed { return $this->data[$this->position]; }

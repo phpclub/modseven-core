@@ -101,6 +101,7 @@ composer self-update
 composer diagnose
 apt update
 apt install php8.4-intl
+apt install php7.3-yaml
 composer install
 ```
 

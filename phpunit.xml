@@ -1,37 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
-         bootstrap="tests/bootstrap.php"
-         colors="true"
-         failOnRisky="true"
-         failOnWarning="true"
-         stopOnFailure="false"
-         cacheDirectory=".phpunit.cache"
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+        bootstrap="vendor/autoload.php"
+        colors="true"
+        verbose="true"
+        backupGlobals="false"
+        backupStaticAttributes="false"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
 >
-    <coverage>
-        <include>
-            <file>./system/classes/Arr.php</file>
-        </include>
-        <report>
-            <text outputFile="php://stdout"/>
-            <html outputDirectory="./coverage-html"/>
-        </report>
-    </coverage>
+    <!-- Задаём кэш через переменную окружения для PHPUnit ≥9.3 -->
+    <php>
+        <env name="PHPUNIT_CACHE_RESULT" value=".phpunit.cache" />
+    </php>
+
     <testsuites>
-        <testsuite name="Unit">
-            <directory>tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory>tests/Integration</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+        <testsuite name="Modseven Tests">
+            <directory suffix="Test.php">tests/Unit</directory>
+            <directory suffix="Test.php">tests/Integration</directory>
+            <directory suffix="Test.php">tests/Feature</directory>
         </testsuite>
     </testsuites>
-    <php>
-        <env name="APP_ENV" value="testing"/>
-        <ini name="display_errors" value="1"/>
-        <ini name="display_startup_errors" value="1"/>
-        <ini name="error_reporting" value="-1"/> <!-- E_ALL включая E_DEPRECATED -->
-    </php>
+
+    <coverage>
+        <include>
+            <directory suffix=".php">./system/classes</directory>
+        </include>
+    </coverage>
 </phpunit>
