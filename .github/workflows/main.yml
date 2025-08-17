@@ -1,1 +1,16 @@
+name: Test K3S Runners
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
 
+jobs:
+  test:
+    runs-on: [self-hosted, k3s]
+    steps:
+      - name: Test runner
+        run: |
+          echo "Running on: $(hostname)"
+          echo "K3S runner working!"
+          kubectl version --client 2>/dev/null || echo "kubectl not available"
+          docker --version 2>/dev/null || echo "docker not available"
