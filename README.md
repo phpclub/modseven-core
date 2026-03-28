@@ -101,6 +101,7 @@ composer self-update
 composer diagnose
 apt update
 apt install php8.4-intl
+update-alternatives --config php
 composer install
 ```
 
@@ -115,7 +116,7 @@ update-alternatives --config php
 
 ## Psalm
 ```shell
-vendor/bin/psalm --alter --issues=MissingIterableValueType --dry-run tests/
+
 ```
 
 ## Special Thanks

@@ -104,7 +104,7 @@ class Validation implements ArrayAccess
      * @param string $offset key to return
      * @return  mixed   value from array
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->_data[$offset];
     }
@@ -192,7 +192,7 @@ class Validation implements ArrayAccess
      * @param array $params extra parameters for the rule
      * @return  self
      */
-    public function rule(string $field, $rule, array $params = NULL): self
+    public function rule(string $field, $rule, ?array $params = NULL): self
     {
         if ($params === NULL) {
             // Default to array(':value')
@@ -406,7 +406,7 @@ class Validation implements ArrayAccess
      * @param array $params
      * @return  self
      */
-    public function error(string $field, string $error, array $params = NULL): self
+    public function error(string $field, string $error, ?array $params = NULL): self
     {
         $this->_errors[$field] = [$error, $params];
 
@@ -428,7 +428,7 @@ class Validation implements ArrayAccess
      * @param mixed $translate translate the message
      * @return  array
      */
-    public function errors(string $file = NULL, $translate = TRUE): array
+    public function errors(?string $file = NULL, $translate = TRUE): array
     {
         if ($file === NULL) {
             // Return the error list

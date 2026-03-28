@@ -8,5 +8,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Define test constants
 define('MODSPATH', realpath(__DIR__ . '/../system/') . DIRECTORY_SEPARATOR);
 define('APPPATH', realpath(__DIR__ . '/Support/') . DIRECTORY_SEPARATOR);
+define('SYSPATH', realpath(__DIR__ . '/../system') . DIRECTORY_SEPARATOR);
 
 // Initialize the framework for testing

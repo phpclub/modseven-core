@@ -447,7 +447,7 @@ class Valid
      * @param int|null $step increment size
      * @return  boolean
      */
-    public static function range(?string $number, int $min, int $max, int $step = NULL): bool
+    public static function range(?string $number, int $min, int $max, ?int $step = NULL): bool
     {
         if ($number < $min || $number > $max) {
             // Number is outside of range
@@ -472,7 +472,7 @@ class Valid
      * @param int|null $digits number of digits
      * @return  boolean
      */
-    public static function decimal(?string $str, int $places = 2, int $digits = NULL): bool
+    public static function decimal(?string $str, int $places = 2, ?int $digits = NULL): bool
     {
         if ($digits > 0) {
             // Specific number of digits

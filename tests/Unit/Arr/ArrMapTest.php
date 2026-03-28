@@ -50,10 +50,6 @@ final class ArrMapTest extends TestCase
 	 */
 	public function testMap(callable|array $method, array $array, ?array $keys, array $expected): void
 	{
-		$this->assertSame(
-			$expected,
-//			Arr::map($array, $method, $keys)
-			Arr::map($method, $array, $keys)
-		);
+		$this->assertSame($expected, Arr::map($method, $array, $keys));
 	}
 }

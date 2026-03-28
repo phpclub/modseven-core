@@ -28,7 +28,8 @@ class Exception extends \Exception
         E_PARSE             => 'Parse Error',
         E_WARNING           => 'Warning',
         E_USER_WARNING      => 'User Warning',
-        E_STRICT            => 'Strict',
+        // E_STRICT was deprecated in PHP 8.4
+        // E_STRICT            => 'Strict',
         E_NOTICE            => 'Notice',
         E_RECOVERABLE_ERROR => 'Recoverable Error',
         E_DEPRECATED        => 'Deprecated',

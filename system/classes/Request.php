@@ -559,7 +559,7 @@ class Request implements HTTP\Request
      * @param string $value Value to set to cookie
      * @return  mixed
      */
-    public function cookie($key = NULL, string $value = NULL)
+    public function cookie($key = NULL, ?string $value = NULL)
     {
         if (is_array($key)) {
             // Act as a setter, replace all cookies
@@ -793,7 +793,7 @@ class Request implements HTTP\Request
      * @param string $value Value to set to the supplied key
      * @return  mixed
      */
-    public function headers($key = NULL, string $value = NULL)
+    public function headers($key = NULL, ?string $value = NULL)
     {
         if ($key instanceof HTTP\Header) {
             // Act a setter, replace all headers

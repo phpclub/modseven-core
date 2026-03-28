@@ -251,7 +251,7 @@ class Header extends ArrayObject
      * @param string $index index to retrieve
      * @return  mixed
      */
-    public function offsetGet($index)
+    public function offsetGet($index): mixed
     {
         return parent::offsetGet(strtolower($index));
     }

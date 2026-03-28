@@ -127,7 +127,7 @@ class Cookie
         unset($_COOKIE[$name]);
 
         // Nullify the cookie and make it expire
-        return self::_setcookie($name, '', -86400, static::$path, static::$domain, static::$secure, static::$httponly);
+        return static::_setcookie($name, '', -86400, static::$path, static::$domain, static::$secure, static::$httponly);
     }
 
     /**
@@ -180,7 +180,7 @@ class Cookie
         // Add the salt to the cookie value
         $value = self::salt($name, $value) . '~' . $value;
 
-        return self::_setcookie($name, $value, $lifetime, static::$path, static::$domain, static::$secure, static::$httponly);
+        return static::_setcookie($name, $value, $lifetime, static::$path, static::$domain, static::$secure, static::$httponly);
     }
 
 }

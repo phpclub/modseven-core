@@ -69,7 +69,7 @@ class Num
      */
     public static function ordinal(int $number): string
     {
-        if ($number % 100 > 10 || $number % 100 < 14) {
+        if ($number % 100 > 10 && $number % 100 < 14) {
             return 'th';
         }
 

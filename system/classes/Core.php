@@ -140,7 +140,7 @@ class Core
      * Include paths that are used to find files
      * @var  array
      */
-    protected static array $_paths = [APPPATH, SYSPATH];
+    protected static array $_paths = [\APPPATH, \SYSPATH];
 
     /**
      * File path cache, used when caching is true in [Modseven::init]
@@ -408,7 +408,7 @@ class Core
      *
      * @return  array
      */
-    public static function listFiles(?string $directory = NULL, array $paths = NULL, $ext = NULL, bool $sort = TRUE): array
+    public static function listFiles(?string $directory = NULL, ?array $paths = NULL, $ext = NULL, bool $sort = TRUE): array
     {
         if ($directory !== NULL) {
             // Add the directory separator
@@ -483,7 +483,7 @@ class Core
      *
      * @return  string|array  message string for the given path, complete message list, when no path is specified
      */
-    public static function message(string $file, string $path = NULL, $default = NULL)
+    public static function message(string $file, ?string $path = NULL, $default = NULL)
     {
         static $messages;
 

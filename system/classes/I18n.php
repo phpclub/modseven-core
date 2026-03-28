@@ -154,7 +154,7 @@ namespace {
          * @return  string
          * @uses    I18n::get
          */
-        function __(string $string, array $values = NULL, string $lang = 'en-us'): string
+        function __(string $string, ?array $values = NULL, string $lang = 'en-us'): string
         {
             if ($lang !== I18n::$lang) {
                 // The message and target languages are different

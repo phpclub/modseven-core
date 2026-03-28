@@ -350,7 +350,7 @@ class Form
      * @param array $attributes html attributes
      * @return  string
      */
-    public static function label(string $input, string $text = NULL, ?array $attributes = NULL): string
+    public static function label(string $input, ?string $text = NULL, ?array $attributes = NULL): string
     {
         if ($text === NULL) {
             // Use the input name as the text
