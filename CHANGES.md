@@ -4,6 +4,11 @@
 
 ### Bug Fixes
 
+- **`Log\Syslog::write()`** — `syslog()` expects an `int` priority; added private `levelToSyslog()` that maps PSR-3 level strings to `LOG_*` constants. Previously both the message and stack-trace calls passed a raw string, causing a TypeError in PHP 8.
+- **`Debug::source()`** — `strlen()` was passed an `int` (`$range['end']`); added explicit `(string)` cast.
+- **`File::split()`** / **`File::join()`** — `str_pad()` first argument must be `string`; both call sites now cast the integer piece counter with `(string)`.
+- **`Validation::errors()`** — `I18n::get()` accepts at most 2 parameters; three call sites were passing a spurious `NULL` second argument followed by `$translate`. Removed the `NULL` and moved `$translate` to position 2.
+- **`Inflector::singular()`** / **`Inflector::plural()`** — `$count` is always cast to `float`, so strict comparisons against the integer literal `1` / `!== 1` always resolved the wrong way (float `1.0 !== int 1` is `true` in PHP). Changed both comparisons to `1.0`, restoring correct singularisation and pluralisation.
 - **`Num::ordinal()`** — replaced `||` with `&&` in the teen-exception condition; the OR was a tautology that made the entire `switch` dead code, so every number incorrectly returned `'th'`.
 - **`Text::bytes()`** — guarded `strpos($force_unit, 'i')` against `null`; calling with a null force-unit caused a deprecation/TypeError in PHP 8.4.
 - **`Cookie::delete()` / `Cookie::set()`** — changed `self::_setcookie()` to `static::_setcookie()` so that subclass overrides (the intended proxy pattern for unit testing) are actually dispatched.
@@ -15,13 +20,20 @@ Resolved all "implicitly marking parameter as nullable is deprecated" warnings a
 | File | Parameter(s) fixed |
 |------|--------------------|
 | `system/classes/Core.php` | `listFiles($paths)`, `message($path)` |
+| `system/classes/Error/Exception.php` | `__construct($previous)` |
 | `system/classes/Exception.php` | removed `E_STRICT` from `$php_errors` (constant deprecated in PHP 8.4) |
 | `system/classes/Form.php` | `label($text)` |
+| `system/classes/Fragment.php` | `_cacheKey($i18n)` |
+| `system/classes/HTTP/Exception.php` | `__construct($previous)`, `request($request)` |
+| `system/classes/HTTP/Exception/Redirect.php` | `__construct($previous)` |
 | `system/classes/HTTP/Header.php` | `offsetGet()` — added `mixed` return type |
+| `system/classes/HTTP/Response.php` | `status($code)` |
 | `system/classes/I18n.php` | `__()` helper `$values` parameter |
 | `system/classes/Request.php` | `cookie($value)`, `headers($value)` |
 | `system/classes/Valid.php` | `range($step)`, `decimal($digits)` |
 | `system/classes/Validation.php` | `rule($params)`, `error($params)`, `errors($file)`, `offsetGet()` return type |
+| `system/classes/Validation/Exception.php` | `__construct($previous)` |
+| `system/classes/View.php` | `__construct($file, $data)`, `factory($file, $data)`, `render($file)` |
 
 ### Test Infrastructure
 
