@@ -447,7 +447,7 @@ class Validation implements ArrayAccess
             if ($translate) {
                 if (is_string($translate)) {
                     // Translate the label using the specified language
-                    $label = I18n::get($label, NULL, $translate);
+                    $label = I18n::get($label, $translate);
                 } else {
                     // Translate the label
                     $label = I18n::get($label);
@@ -483,7 +483,7 @@ class Validation implements ArrayAccess
                         if ($translate) {
                             if (is_string($translate)) {
                                 // Translate the value using the specified language
-                                $value = I18n::get($value, NULL, $translate);
+                                $value = I18n::get($value, $translate);
                             } else {
                                 // Translate the value
                                 $value = I18n::get($value);
@@ -512,7 +512,7 @@ class Validation implements ArrayAccess
             if ($translate) {
                 if (is_string($translate)) {
                     // Translate the message using specified language
-                    $message = I18n::get([$message, $values], NULL, $translate);
+                    $message = I18n::get([$message, $values], $translate);
                 } else {
                     // Translate the message using the default language
                     $message = I18n::get([$message, $values]);

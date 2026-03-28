@@ -28,7 +28,7 @@ class Exception extends \Modseven\Exception
      * @param int             $code     the exception code
      * @param null|\Exception $previous Previous Exception
      */
-    public function __construct(Validation $array, string $message = 'Failed to validate array', ?array $values = NULL, int $code = 0, \Exception $previous = NULL)
+    public function __construct(Validation $array, string $message = 'Failed to validate array', ?array $values = null, int $code = 0, ?\Exception $previous = null)
     {
         $this->array = $array;
 

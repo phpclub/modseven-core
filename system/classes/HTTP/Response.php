@@ -24,6 +24,6 @@ interface Response extends Message
      * @param integer $code Status to set to this response
      * @return  mixed
      */
-    public function status(int $code = NULL);
+    public function status(?int $code = null);
 
 }

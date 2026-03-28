@@ -27,7 +27,7 @@ class Exception extends \Modseven\Exception
      * @param array $variables translation variables
      * @param Throwable|null $previous
      */
-    public function __construct(string $message = '', ?array $variables = NULL, int $code = 0, Throwable $previous = NULL)
+    public function __construct(string $message = '', ?array $variables = null, int $code = 0, ?Throwable $previous = null)
     {
         $this->_code = $code;
         parent::__construct($message, $variables, $code, $previous);
@@ -55,7 +55,7 @@ class Exception extends \Modseven\Exception
      *
      * @return  self|Request
      */
-    public function request(Request $request = NULL)
+    public function request(?Request $request = null)
     {
         if ($request === NULL) {
             return $this->_request;

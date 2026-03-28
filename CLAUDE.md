@@ -88,3 +88,26 @@ Test classes live under `Modseven\Tests\` (mapped to `tests/`). The `tests/Suppo
 - **PSR-3** (`psr/log`): `Log` class and `Log\Writer` implement the logger interface
 - **PSR-6** (`psr/cache`): `Cache\Item` implements `CacheItemInterface`
 - **PSR-16** (`psr/simple-cache`): `Cache` implements `SimpleCache\CacheInterface`
+
+## Known Incomplete Areas (DO NOT AUTO-FIX)
+
+- `Controller.php:93`, `Controller/REST.php:58,125` — calls to `HTTP\Request::action()` and `::param()` are **unfinished Kohana→Modseven migration**. These methods do not exist on `HTTP\Request`. Do not invent implementations — flag and ask.
+- `HTTP.php:68` — `HTTP\Response::generateEtag()` does not exist. Needs design decision.
+- `Controller/REST.php` — `send_file()` missing. Architecture review required before implementing.
+
+## Agent Rules
+
+- NEVER refactor cascading filesystem or `Core::init()` without explicit instruction
+- ALWAYS run tests inside Docker: `docker compose exec modseven bash`
+- Static analysis baseline: `./vendor/bin/psalm && ./vendor/bin/phpstan analyse`
+- Run tests after every change: `./vendor/bin/phpunit --testsuite Unit`
+- When fixing type errors: prefer explicit casts `(string)`, `(int)` over type coercion
+- `Modseven\callback` is NOT a valid type — always replace with `callable`
+
+## Docker Context
+
+All PHP commands run inside container. From host:
+```bash
+docker compose exec modseven bash -c "./vendor/bin/phpunit"
+```
+EOF

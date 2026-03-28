@@ -22,7 +22,7 @@ class Exception extends ErrorException
      * @param int             $line         The line number where the exception is thrown.
      * @param Throwable|null $previous     Previous throwable
      */
-    public function __construct(string $message = '', ?array $variables = NULL, int $code = 0, int $severity = 1, string $file = __FILE__, int $line = __LINE__, Throwable $previous = NULL)
+    public function __construct(string $message = '', ?array $variables = null, int $code = 0, int $severity = 1, string $file = __FILE__, int $line = __LINE__, ?Throwable $previous = null)
     {
         // Set the message
         $message = I18n::get([$message, $variables]);

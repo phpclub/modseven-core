@@ -85,7 +85,7 @@ class Fragment
      * @param boolean $i18n multilingual fragment support
      * @return  string
      */
-    protected static function _cacheKey(string $name, bool $i18n = NULL): string
+    protected static function _cacheKey(string $name, ?bool $i18n = null): string
     {
         if ($i18n === NULL) {
             // Use the default setting

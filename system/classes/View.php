@@ -37,7 +37,7 @@ class View
      *
      * @throws Exception
      */
-    public function __construct(string $file = null, array $data = null)
+    public function __construct(?string $file = null, ?array $data = null)
     {
         if ($file !== null) {
             $this->setFilename($file);
@@ -84,7 +84,7 @@ class View
      *
      * @throws Exception
      */
-    public static function factory(string $file = null, array $data = null): View
+    public static function factory(?string $file = null, ?array $data = null): View
     {
         return new self($file, $data);
     }
@@ -240,7 +240,7 @@ class View
      * @throws  View\Exception
      * @throws Exception
      */
-    public function render(string $file = null): string
+    public function render(?string $file = null): string
     {
         if ($file !== null) {
             $this->setFilename($file);

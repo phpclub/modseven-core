@@ -47,12 +47,32 @@ class Syslog extends Writer {
     public function write(string $message) : void
     {
         $original = $this->_original;
-        syslog($original['level'], $message);
+        syslog($this->levelToSyslog($original['level']), $message);
 
         if (isset($original['context']['exception']))
         {
-            syslog(static::$strace_level, $original['context']['exception']->getTraceAsString());
+            syslog($this->levelToSyslog(static::$strace_level), $original['context']['exception']->getTraceAsString());
         }
+    }
+
+    /**
+     * Maps a PSR-3 log level string to a syslog priority integer.
+     *
+     * @param string $level PSR-3 level string
+     * @return int syslog priority constant
+     */
+    private function levelToSyslog(string $level): int
+    {
+        return match ($level) {
+            'emergency' => LOG_EMERG,
+            'alert'     => LOG_ALERT,
+            'critical'  => LOG_CRIT,
+            'error'     => LOG_ERR,
+            'warning'   => LOG_WARNING,
+            'notice'    => LOG_NOTICE,
+            'info'      => LOG_INFO,
+            default     => LOG_DEBUG,
+        };
     }
 
     /**

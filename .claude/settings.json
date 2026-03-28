@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "phpstorm-plugin@phpstorm-marketplace": true
+  }
+}

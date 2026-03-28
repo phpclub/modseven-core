@@ -348,7 +348,7 @@ class Debug
         $range = ['start' => $line_number - $padding, 'end' => $line_number + $padding];
 
         // Set the zero-padding amount for line numbers
-        $format = '% ' . strlen($range['end']) . 'd';
+        $format = '% ' . strlen((string)$range['end']) . 'd';
 
         $source = '';
         while (($row = fgets($file)) !== FALSE) {

@@ -58,7 +58,7 @@ class Inflector
         $count = ($count === NULL) ? 1.0 : (float)$count;
 
         // Do nothing when $count is not 1
-        if ($count !== 1) {
+        if ($count !== 1.0) {
             return $str;
         }
 
@@ -146,7 +146,7 @@ class Inflector
         $count = ($count === NULL) ? 0.0 : (float)$count;
 
         // Do nothing with singular
-        if ($count === 1) {
+        if ($count === 1.0) {
             return $str;
         }
 

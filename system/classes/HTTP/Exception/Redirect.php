@@ -27,7 +27,7 @@ class Redirect extends Exception
      * @param Throwable|null $previous
      * @throws Exception
      */
-    public function __construct(string $uri = '', ?array $variables = NULL, int $code = 303, Throwable $previous = NULL)
+    public function __construct(string $uri = '', ?array $variables = null, int $code = 303, ?Throwable $previous = null)
     {
         if ($code < 300 || $code > 308) {
             throw Exception::factory(500, 'Invalid redirect code \':code\'', [':code' => $code]);
